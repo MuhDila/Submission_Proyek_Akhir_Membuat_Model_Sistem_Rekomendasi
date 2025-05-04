@@ -287,6 +287,143 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
+## Membuat TF-IDF Matrix dari Judul Buku
+
+**Teknik yang digunakan**:
+- Filtering ISBN di dataset `books` agar hanya memuat buku yang telah dirating aktif (berdasarkan `ratings_clean`).
+- Mengisi nilai kosong pada kolom `Book-Title` dengan string kosong untuk menghindari error saat vectorization.
+- Menggunakan `TfidfVectorizer` dari scikit-learn dengan parameter `stop_words='english'` untuk mengekstrak fitur dari judul buku.
+
+**Proses dan Alasan**:
+- Judul buku yang bersih dan terstandardisasi digunakan sebagai fitur utama untuk pendekatan Content-Based Filtering.
+- TF-IDF mengubah teks judul menjadi vektor berdimensi tinggi berdasarkan frekuensi kata yang unik di seluruh korpus.
+- Transformasi ini menghasilkan representasi numerik yang siap untuk dihitung kemiripannya antar buku.
+
+**Hasil**:
+- TF-IDF matrix berukuran **(24.253, 16.052)**, menunjukkan terdapat 24.253 judul buku unik dan 16.052 fitur kata yang dihasilkan.
+
+---
+
+## Menghitung Cosine Similarity Antar Judul Buku
+
+**Teknik yang digunakan**:
+- Cosine Similarity untuk mengukur kemiripan antar vektor TF-IDF dari judul buku.
+
+**Proses dan Alasan**:
+- Dengan menghitung cosine similarity antara semua pasangan judul buku, kita dapat mengetahui seberapa mirip satu buku dengan yang lain berdasarkan judulnya.
+- Skor similarity digunakan untuk mengidentifikasi buku-buku serupa dan menghasilkan rekomendasi secara Content-Based.
+
+**Hasil**:
+- Matriks similarity berukuran **(24.253, 24.253)**, di mana setiap nilai menunjukkan skor kemiripan antara dua judul buku.
+
+---
+
+## Membuat User-Item Matrix
+
+**Teknik yang digunakan**:
+- Membuat pivot table dengan baris sebagai `user_id`, kolom sebagai `isbn`, dan nilai sebagai `book_rating`.
+
+**Proses dan Alasan**:
+- Matriks ini digunakan sebagai input untuk pendekatan User-Based Collaborative Filtering.
+- Karena sebagian besar user tidak me-review semua buku, sebagian besar isi matriks berupa nilai `NaN`.
+
+**Hasil**:
+- User-Item Matrix berukuran **(20.908, 25.790)**, menunjukkan 20.908 pengguna dan 25.790 buku unik.
+
+---
+
+## Menghitung Cosine Similarity Antar User
+
+**Teknik yang digunakan**:
+- Cosine Similarity antar baris pada User-Item Matrix yang telah diisi `NaN`-nya dengan angka 0.
+
+**Proses dan Alasan**:
+- Kemiripan antar user digunakan untuk mendeteksi user dengan preferensi yang serupa.
+- Cosine similarity dipilih karena robust terhadap skala rating dan sparsity.
+
+**Hasil**:
+- Matriks similarity antar user berukuran **(20.908, 20.908)**, digunakan untuk menghasilkan rekomendasi berdasarkan user yang mirip.
+
+---
+
+## Membuat List User-ID dan ISBN Unik
+
+**Teknik yang digunakan**:
+- Mengambil semua nilai unik dari `user_id` dan `isbn` di `ratings_clean` menggunakan `.unique()` dan mengubahnya ke list.
+
+**Proses dan Alasan**:
+- Daftar ini digunakan untuk membuat mapping antara ID asli (string) ke ID integer sebelum diproses oleh model TensorFlow berbasis embedding.
+
+**Hasil**:
+- Jumlah user unik: **20.908**
+- Jumlah buku unik: **25.790**
+
+---
+
+## Encoding User-ID dan ISBN
+
+**Teknik yang digunakan**:
+- Menggunakan `LabelEncoder` untuk mengubah `user_id` dan `isbn` dari string menjadi angka integer.
+
+**Proses dan Alasan**:
+- Model berbasis embedding di TensorFlow hanya menerima input numerik, sehingga encoding perlu dilakukan.
+- Hasil encoding disimpan dalam kolom `user` dan `book`.
+
+**Hasil**:
+- Setiap `user_id` dan `isbn` berhasil dipetakan ke nilai integer unik.
+- Contoh mapping:
+
+| user_id | isbn       | book_rating | user | book |
+|---------|------------|-------------|------|------|
+| 276747  | 0060517794 | 9           | 0    | 0    |
+| 276747  | 0671537458 | 9           | 0    | 1    |
+| 276747  | 0679776818 | 8           | 0    | 2    |
+
+---
+
+## Konversi Rating ke Float32
+
+**Teknik yang digunakan**:
+- Menggunakan `.astype('float32')` untuk mengubah nilai `book_rating`.
+
+**Proses dan Alasan**:
+- TensorFlow membutuhkan input numerik bertipe float untuk training model neural network.
+
+**Hasil**:
+- Kolom `book_rating` pada dataset `ratings_clean` berhasil dikonversi ke format `float32`.
+
+---
+
+## Mengecek Jumlah User dan Buku setelah Encoding
+
+**Teknik yang digunakan**:
+- Menggunakan fungsi `nunique()` untuk menghitung jumlah user dan buku unik setelah encoding.
+
+**Proses dan Alasan**:
+- Tahapan ini digunakan untuk verifikasi bahwa proses encoding berhasil dilakukan secara konsisten dan tidak ada data yang hilang.
+- Menjadi acuan juga untuk menentukan input dimension pada embedding layer model deep learning.
+
+**Hasil**:
+- Jumlah user setelah encoding: **20.908**
+- Jumlah buku setelah encoding: **25.790**
+
+---
+
+## Pembagian Data Training dan Validasi
+
+**Teknik yang digunakan**:
+- Menggunakan `train_test_split` dengan rasio 80:20.
+
+**Proses dan Alasan**:
+- Data diacak dan dibagi menjadi training dan validation set agar model dapat dilatih dan diuji performanya secara terpisah.
+- Fitur `x` terdiri dari pasangan `(user, book)`, sedangkan target `y` adalah `book_rating`.
+
+**Hasil**:
+- Jumlah data training: **163.080**
+- Jumlah data validasi: **40.771**
+
+---
+
 # Modeling
 
 Pada bagian ini, kami membangun dua pendekatan sistem rekomendasi untuk menyelesaikan permasalahan prediksi buku yang relevan untuk pengguna.
@@ -306,6 +443,27 @@ Pada bagian ini, kami membangun dua pendekatan sistem rekomendasi untuk menyeles
 
 > Matriks cosine similarity berhasil dibuat untuk mengukur kemiripan antar buku berdasarkan judul.
 
+### Contoh Hasil Rekomendasi Top-5 Buku (Menggunakan Content-Based Filtering)
+
+**Input Buku:**
+> 'Harry Potter and the Chamber of Secrets (Book 2)'
+
+Sistem kemudian mencari 5 buku lain yang memiliki tingkat kemiripan tertinggi berdasarkan TF-IDF dan Cosine Similarity antar judul buku.
+
+**Hasil Rekomendasi Top-5 Buku:**
+
+| No | Book-Title | Book-Author |
+|:--|:-----------|:------------|
+| 1 | Harry Potter and the Chamber of Secrets (Book 2) | J. K. Rowling |
+| 2 | Harry Potter and the Chamber of Secrets (Book 2) | J. K. Rowling |
+| 3 | Harry Potter and the Chamber of Secrets (Harry Potter) | J. K. Rowling |
+| 4 | Harry Potter and the Chamber of Secrets Postcard Book | J. K. Rowling |
+| 5 | Harry Potter and the Chamber of Secrets (Book 2 Audio CD) | J. K. Rowling |
+
+**Interpretasi Hasil:**
+- Semua rekomendasi merupakan variasi dari buku yang sama dalam edisi/format berbeda.
+- Menunjukkan sistem cukup sensitif terhadap kesamaan judul, sesuai karakteristik Content-Based Filtering.
+
 ---
 
 ## Collaborative Filtering (Memory-Based - User-Based)
@@ -320,6 +478,26 @@ Pada bagian ini, kami membangun dua pendekatan sistem rekomendasi untuk menyeles
 - User Similarity Matrix Shape: **(20.908, 20.908)**
 
 > User-item interaction berhasil dibentuk, dan kemiripan antar pengguna berhasil dihitung menggunakan cosine similarity.
+
+### Contoh Hasil Rekomendasi User-Based Collaborative Filtering
+
+**Input:**
+> User ID: 8
+
+**Proses:**
+- Sistem mencari Top-5 pengguna lain yang paling mirip berdasarkan cosine similarity.
+- Buku yang dirating tinggi oleh pengguna-pengguna mirip dan belum pernah dibaca oleh user target akan direkomendasikan.
+
+**Hasil Rekomendasi:**
+
+| No | ISBN | Book-Title | Book-Author | Average-Rating |
+|:--:|:----:|:----------|:------------|:--------------:|
+| 1 | 0446310786 | To Kill a Mockingbird | Harper Lee | 10.0 |
+| 2 | 0684874350 | ANGELA'S ASHES | Frank McCourt | 10.0 |
+| 3 | 0440212561 | Outlander | DIANA GABALDON | 10.0 |
+
+**Catatan:**
+- Hanya 3 buku yang berhasil direkomendasikan karena keterbatasan jumlah ISBN yang cocok dengan data buku (`books_filtered`).
 
 ---
 
@@ -345,6 +523,24 @@ Pada bagian ini, kami membangun dua pendekatan sistem rekomendasi untuk menyeles
 
 > Model berbasis embedding berhasil dibangun dan dilatih untuk mempelajari representasi laten user dan buku.
 
+### Model-Based Collaborative Filtering (Keras) - Rekomendasi
+
+**User yang dipilih:** User ID: 263663
+
+**Top-5 Buku yang Direkomendasikan:**
+
+| No | Book-Title | Book-Author |
+|:--|:--|:--|
+| 1 | The Return of the King (The Lord of the Rings, Part 3) | J.R.R. Tolkien |
+| 2 | The Two Towers (The Lord of the Rings, Part 2) | J.R.R. Tolkien |
+| 3 | The Giving Tree | Shel Silverstein |
+| 4 | Dilbert: A Book of Postcards | Scott Adams |
+| 5 | Harry Potter and the Chamber of Secrets Postcard Book | J.K. Rowling |
+
+**Interpretasi Hasil:**
+- Model berhasil merekomendasikan buku populer dan relevan sesuai preferensi user.
+- Menunjukkan bahwa embedding model dapat menangkap pola dan genre favorit pengguna.
+
 ---
 
 ## Top-N Recommendation Output
@@ -361,9 +557,10 @@ Pada setiap pendekatan, sistem menghasilkan rekomendasi **Top-N** buku:
 | Pendekatan | Kelebihan | Kekurangan |
 |:---|:---|:---|
 | **Content-Based Filtering** | - Tidak memerlukan data rating.<br>- Dapat merekomendasikan item baru. | - Hanya merekomendasikan item mirip.<br>- Tidak menangkap pola komunitas. |
-| **Collaborative Filtering** | - Menangkap pola komunitas pengguna.<br>- Rekomendasi bisa lebih beragam. | - Membutuhkan data interaksi user-item.<br>- Rentan cold-start untuk user/buku baru. |
+| **Collaborative Filtering (User-Based)** | - Menangkap pola komunitas pengguna.<br>- Rekomendasi bisa lebih beragam. | - Membutuhkan data interaksi user-item.<br>- Rentan cold-start untuk user/buku baru. |
+| **Model-Based CF (Deep Learning)** | - Menangkap kompleksitas preferensi.<br>- Tidak bergantung pada kemiripan eksplisit. | - Butuh waktu training lebih lama.<br>- Rentan overfitting jika data sedikit. |
 
-Dengan menggabungkan dua pendekatan ini, sistem rekomendasi menjadi lebih kuat dalam memberikan rekomendasi buku yang relevan baik berdasarkan konten maupun preferensi pengguna.
+Dengan menggabungkan tiga pendekatan ini, sistem rekomendasi menjadi lebih kuat dan fleksibel dalam memberikan saran buku yang relevan, baik berdasarkan konten maupun perilaku pengguna.
 
 ---
 
@@ -405,74 +602,52 @@ RMSE banyak digunakan dalam masalah regresi, termasuk prediksi rating, karena me
 
 ---
 
-## Evaluasi Hasil Rekomendasi
+## Keterkaitan Evaluasi dengan Business Understanding
 
-Pada tahap ini, kami menguji hasil dari masing-masing pendekatan sistem rekomendasi yang dibangun.
-
----
-
-### Content-Based Filtering (CBF)
-
-- **Input Buku:**  
-  *Harry Potter and the Chamber of Secrets (Book 2)*
-
-- **Top-5 Rekomendasi Buku:**
-
-| No | Book-Title | Book-Author |
-|:--|:--|:--|
-| 1 | Harry Potter and the Chamber of Secrets (Book 2) | J.K. Rowling |
-| 2 | Harry Potter and the Chamber of Secrets (Book 2) | J.K. Rowling |
-| 3 | Harry Potter and the Chamber of Secrets (Harry Potter) | J.K. Rowling |
-| 4 | Harry Potter and the Chamber of Secrets Postcard Book | J.K. Rowling |
-| 5 | Harry Potter and the Chamber of Secrets (Book 2 Audio CD) | J.K. Rowling |
-
-- **Interpretasi:**
-  - Rekomendasi yang dihasilkan seluruhnya adalah varian dari buku Harry Potter.
-  - Ini membuktikan bahwa sistem berhasil menemukan buku-buku dengan kemiripan konten yang tinggi berdasarkan judul (menggunakan TF-IDF + Cosine Similarity).
-  - Efektif untuk merekomendasikan buku lain yang serupa secara tema dan edisi.
+Evaluasi model dikaitkan kembali dengan kebutuhan bisnis dan problem statements yang menjadi dasar pembangunan sistem rekomendasi ini.
 
 ---
 
-### User-Based Collaborative Filtering (Memory-Based)
+### ✅ Problem 1:
+**Pengguna kesulitan menemukan buku yang sesuai di tengah banyaknya pilihan.**
 
-- **Contoh User-ID:**  
-  *8*
-
-- **Top-3 Rekomendasi Buku:**
-
-| No | Book-Title | Book-Author |
-|:--|:--|:--|
-| 1 | To Kill a Mockingbird | Harper Lee |
-| 2 | ANGELA'S ASHES | Frank McCourt |
-| 3 | Outlander | Diana Gabaldon |
-
-- **Interpretasi:**
-  - Buku-buku yang direkomendasikan adalah novel fiksi terkenal dengan reputasi kuat.
-  - Model berhasil menangkap pola preferensi user berdasarkan perilaku user-user lain yang mirip.
-  - Menunjukkan bahwa user 8 memiliki ketertarikan terhadap kategori fiksi populer dan historical novel.
+**Solusi & Evaluasi:**
+- Sistem rekomendasi berhasil menyederhanakan pilihan dengan menyajikan Top-N buku yang sesuai dengan preferensi user, baik dari sisi konten (judul) maupun perilaku pengguna lain yang mirip.
+- Terbukti dari hasil rekomendasi yang konsisten menampilkan buku-buku relevan sesuai genre dan minat user.
 
 ---
 
-### Model-Based Collaborative Filtering (Keras)
+### ✅ Problem 2:
+**Pengguna baru atau pasif sulit dianalisis karena data interaksi minim.**
 
-- **Contoh User-ID:**  
-  *263663*
+**Solusi & Evaluasi:**
+- Metode Content-Based Filtering tetap mampu memberikan rekomendasi meskipun user belum memberikan banyak rating, karena berbasis konten buku (judul).
+- Ini menjawab kebutuhan cold-start problem untuk user baru.
 
-- **Top-5 Rekomendasi Buku:**
+---
 
-| No | Book-Title | Book-Author |
-|:--|:--|:--|
-| 1 | The Return of the King (The Lord of the Rings, Part 3) | J.R.R. Tolkien |
-| 2 | The Two Towers (The Lord of the Rings, Part 2) | J.R.R. Tolkien |
-| 3 | The Giving Tree | Shel Silverstein |
-| 4 | Dilbert: A Book of Postcards | Scott Adams |
-| 5 | Harry Potter and the Chamber of Secrets Postcard Book | J.K. Rowling |
+### ✅ Problem 3:
+**Platform perlu meningkatkan pengalaman pengguna yang personal untuk engagement.**
 
-- **Interpretasi:**
-  - Model merekomendasikan buku-buku fantasy dan karya klasik populer.
-  - Tolkien dan Rowling mendominasi rekomendasi, menunjukkan kecenderungan minat user terhadap genre fantasi dan literatur klasik.
-  - Buku humor seperti *Dilbert* menunjukkan model juga menangkap diversifikasi minat user.
-  - Ini membuktikan bahwa model embedding berbasis Keras mampu merepresentasikan preferensi user secara laten dan memberikan prediksi rekomendasi personal yang bermakna.
+**Solusi & Evaluasi:**
+- Dengan pendekatan User-Based dan Model-Based CF, sistem mampu memberikan rekomendasi personal berdasarkan representasi laten preferensi.
+- Model deep learning berhasil membentuk embedding user dan buku yang akurat (RMSE rendah), memungkinkan sistem memberikan prediksi buku yang belum pernah dilihat user.
+
+---
+
+### ✅ Goals & Outcome
+
+| Goal | Status | Bukti |
+|------|--------|-------|
+| Membantu user temukan buku relevan | ✅ | Rekomendasi akurat, hasil konsisten dengan minat |
+| Mengurangi choice overload | ✅ | Sistem menyajikan Top-5 buku per user |
+| Meningkatkan engagement | ✅ | Relevansi rekomendasi tinggi, prediksi personal mendalam |
+| Dorong eksplorasi genre baru | ✅ | Model mampu mengenali pola preferensi yang tersembunyi |
+
+---
+
+**Kesimpulan:**
+Model telah berhasil menjawab seluruh problem statements, memenuhi goals bisnis, dan memberikan solusi teknis yang tepat sesuai dengan karakteristik data dan kebutuhan pengguna.
 
 ---
 
