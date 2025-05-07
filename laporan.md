@@ -225,7 +225,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Handling Missing Value pada Kolom Age
+### Handling Missing Value pada Kolom Age
 
 **Teknik yang digunakan**:
 - Menghapus baris yang memiliki missing value pada kolom `Age` menggunakan fungsi `dropna(subset=['Age'])`.
@@ -237,7 +237,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Handling Outlier pada Kolom Age
+### Handling Outlier pada Kolom Age
 
 **Teknik yang digunakan**:
 - Filtering nilai `Age` untuk hanya mempertahankan data dengan usia antara 5 hingga 100 tahun.
@@ -249,7 +249,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Filtering Data Rating
+### Filtering Data Rating
 
 **Teknik yang digunakan**:
 - Menghapus data rating dengan nilai `Book-Rating == 0`.
@@ -261,7 +261,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Filtering User dan Buku Berdasarkan Aktivitas Minimum
+### Filtering User dan Buku Berdasarkan Aktivitas Minimum
 
 **Teknik yang digunakan**:
 - Filtering untuk hanya mempertahankan:
@@ -275,7 +275,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Membuat DataFrame Clean untuk Modeling
+### Membuat DataFrame Clean untuk Modeling
 
 **Teknik yang digunakan**:
 - Mengubah kolom `User-ID`, `ISBN`, dan `Book-Rating` menjadi list menggunakan `.tolist()`.
@@ -287,38 +287,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Membuat TF-IDF Matrix dari Judul Buku
-
-**Teknik yang digunakan**:
-- Filtering ISBN di dataset `books` agar hanya memuat buku yang telah dirating aktif (berdasarkan `ratings_clean`).
-- Mengisi nilai kosong pada kolom `Book-Title` dengan string kosong untuk menghindari error saat vectorization.
-- Menggunakan `TfidfVectorizer` dari scikit-learn dengan parameter `stop_words='english'` untuk mengekstrak fitur dari judul buku.
-
-**Proses dan Alasan**:
-- Judul buku yang bersih dan terstandardisasi digunakan sebagai fitur utama untuk pendekatan Content-Based Filtering.
-- TF-IDF mengubah teks judul menjadi vektor berdimensi tinggi berdasarkan frekuensi kata yang unik di seluruh korpus.
-- Transformasi ini menghasilkan representasi numerik yang siap untuk dihitung kemiripannya antar buku.
-
-**Hasil**:
-- TF-IDF matrix berukuran **(24.253, 16.052)**, menunjukkan terdapat 24.253 judul buku unik dan 16.052 fitur kata yang dihasilkan.
-
----
-
-## Menghitung Cosine Similarity Antar Judul Buku
-
-**Teknik yang digunakan**:
-- Cosine Similarity untuk mengukur kemiripan antar vektor TF-IDF dari judul buku.
-
-**Proses dan Alasan**:
-- Dengan menghitung cosine similarity antara semua pasangan judul buku, kita dapat mengetahui seberapa mirip satu buku dengan yang lain berdasarkan judulnya.
-- Skor similarity digunakan untuk mengidentifikasi buku-buku serupa dan menghasilkan rekomendasi secara Content-Based.
-
-**Hasil**:
-- Matriks similarity berukuran **(24.253, 24.253)**, di mana setiap nilai menunjukkan skor kemiripan antara dua judul buku.
-
----
-
-## Membuat User-Item Matrix
+### Membuat User-Item Matrix
 
 **Teknik yang digunakan**:
 - Membuat pivot table dengan baris sebagai `user_id`, kolom sebagai `isbn`, dan nilai sebagai `book_rating`.
@@ -332,21 +301,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Menghitung Cosine Similarity Antar User
-
-**Teknik yang digunakan**:
-- Cosine Similarity antar baris pada User-Item Matrix yang telah diisi `NaN`-nya dengan angka 0.
-
-**Proses dan Alasan**:
-- Kemiripan antar user digunakan untuk mendeteksi user dengan preferensi yang serupa.
-- Cosine similarity dipilih karena robust terhadap skala rating dan sparsity.
-
-**Hasil**:
-- Matriks similarity antar user berukuran **(20.908, 20.908)**, digunakan untuk menghasilkan rekomendasi berdasarkan user yang mirip.
-
----
-
-## Membuat List User-ID dan ISBN Unik
+### Membuat List User-ID dan ISBN Unik
 
 **Teknik yang digunakan**:
 - Mengambil semua nilai unik dari `user_id` dan `isbn` di `ratings_clean` menggunakan `.unique()` dan mengubahnya ke list.
@@ -360,7 +315,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Encoding User-ID dan ISBN
+### Encoding User-ID dan ISBN
 
 **Teknik yang digunakan**:
 - Menggunakan `LabelEncoder` untuk mengubah `user_id` dan `isbn` dari string menjadi angka integer.
@@ -381,7 +336,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Konversi Rating ke Float32
+### Konversi Rating ke Float32
 
 **Teknik yang digunakan**:
 - Menggunakan `.astype('float32')` untuk mengubah nilai `book_rating`.
@@ -394,7 +349,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Mengecek Jumlah User dan Buku setelah Encoding
+### Mengecek Jumlah User dan Buku setelah Encoding
 
 **Teknik yang digunakan**:
 - Menggunakan fungsi `nunique()` untuk menghitung jumlah user dan buku unik setelah encoding.
@@ -409,7 +364,7 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 ---
 
-## Pembagian Data Training dan Validasi
+### Pembagian Data Training dan Validasi
 
 **Teknik yang digunakan**:
 - Menggunakan `train_test_split` dengan rasio 80:20.
@@ -426,31 +381,41 @@ Teknik yang digunakan pada notebook dan laporan disusun secara berurutan sesuai 
 
 # Modeling
 
-Pada bagian ini, kami membangun dua pendekatan sistem rekomendasi untuk menyelesaikan permasalahan prediksi buku yang relevan untuk pengguna.
+Pada bagian ini, kami membangun tiga pendekatan sistem rekomendasi untuk menyelesaikan permasalahan prediksi buku yang relevan untuk pengguna, yaitu:
+1. Content-Based Filtering
+2. Collaborative Filtering (Memory-Based)
+3. Collaborative Filtering (Model-Based menggunakan TensorFlow)
 
 ---
 
-## Content-Based Filtering
+### Content-Based Filtering
 
-### Proses:
-- Membuat TF-IDF vectorizer dari kolom `Book-Title`.
-- Menghitung cosine similarity antar judul buku.
-- Membuat fungsi `recommend_books(book_title)` untuk menghasilkan Top-N rekomendasi.
+Pendekatan ini merekomendasikan buku berdasarkan kemiripan konten, dalam hal ini judul buku. Tahapan modeling dilakukan sebagai berikut:
 
-### Output:
-- TF-IDF Matrix Shape: **(24.253, 16.052)**
-- Cosine Similarity Matrix Shape: **(24.253, 24.253)**
+#### 1. Membuat TF-IDF Matrix dari Judul Buku
 
-> Matriks cosine similarity berhasil dibuat untuk mengukur kemiripan antar buku berdasarkan judul.
+Pada tahap ini, kami mempersiapkan fitur konten dari buku dengan langkah-langkah:
 
-### Contoh Hasil Rekomendasi Top-5 Buku (Menggunakan Content-Based Filtering)
+- **Filtering Buku**: Dataset `books` difilter agar hanya memuat ISBN yang ada pada `ratings_clean`, memastikan hanya buku yang pernah dirating aktif yang diproses.
+- **Handling Missing Value**: Mengisi nilai kosong pada kolom `Book-Title` dengan string kosong (`''`) untuk menghindari error saat vectorization.
+- **TF-IDF Vectorization**: Menggunakan `TfidfVectorizer(stop_words='english')` untuk mentransformasikan teks judul menjadi vektor numerik.
+- **Hasil**: Dihasilkan TF-IDF matrix berukuran **(24.253, 16.052)**, yaitu 24.253 judul buku dan 16.052 kata unik sebagai fitur.
 
-**Input Buku:**
+#### 2. Menghitung Cosine Similarity Antar Judul Buku
+
+Langkah ini bertujuan mengukur kemiripan antar buku berdasarkan vektor TF-IDF.
+
+- **Teknik**: Menggunakan `cosine_similarity` dari scikit-learn untuk menghitung skor antar kombinasi judul buku.
+- **Hasil**: Matriks cosine similarity berukuran **(24.253, 24.253)**, menunjukkan skor kemiripan semua kombinasi buku terhadap satu sama lain.
+
+#### 3. Rekomendasi Berdasarkan Judul Buku
+
+Sistem kemudian mencari Top-N buku dengan skor similarity tertinggi dari satu buku input:
+
+**Contoh Input Buku:**
 > 'Harry Potter and the Chamber of Secrets (Book 2)'
 
-Sistem kemudian mencari 5 buku lain yang memiliki tingkat kemiripan tertinggi berdasarkan TF-IDF dan Cosine Similarity antar judul buku.
-
-**Hasil Rekomendasi Top-5 Buku:**
+**Top-5 Rekomendasi:**
 
 | No | Book-Title | Book-Author |
 |:--|:-----------|:------------|
@@ -460,35 +425,35 @@ Sistem kemudian mencari 5 buku lain yang memiliki tingkat kemiripan tertinggi be
 | 4 | Harry Potter and the Chamber of Secrets Postcard Book | J. K. Rowling |
 | 5 | Harry Potter and the Chamber of Secrets (Book 2 Audio CD) | J. K. Rowling |
 
-**Interpretasi Hasil:**
-- Semua rekomendasi merupakan variasi dari buku yang sama dalam edisi/format berbeda.
-- Menunjukkan sistem cukup sensitif terhadap kesamaan judul, sesuai karakteristik Content-Based Filtering.
+**Interpretasi:**
+- Sistem sangat sensitif terhadap kesamaan string judul, sehingga merekomendasikan berbagai versi/format dari buku yang sama.
+- Ini adalah karakteristik umum pendekatan berbasis konten.
 
 ---
 
-## Collaborative Filtering (Memory-Based - User-Based)
+### Collaborative Filtering (Memory-Based - User-Based)
 
-### Proses:
-- Membentuk User-Item Matrix dari data rating.
-- Menghitung cosine similarity antar user berdasarkan User-Item Matrix.
-- Membuat fungsi `recommend_books_userbased(user_id)` untuk menghasilkan Top-N rekomendasi berdasarkan user similarity.
+Pendekatan ini merekomendasikan buku berdasarkan pengguna lain yang memiliki pola rating serupa.
 
-### Output:
-- User-Item Matrix Shape: **(20.908, 25.790)**
-- User Similarity Matrix Shape: **(20.908, 20.908)**
+#### 1. Membentuk User-Item Matrix
 
-> User-item interaction berhasil dibentuk, dan kemiripan antar pengguna berhasil dihitung menggunakan cosine similarity.
+- Matriks interaksi user-item dibentuk dalam bentuk pivot table.
+- Baris adalah `user_id`, kolom adalah `isbn`, dan isi adalah `book_rating`.
+- **Ukuran Matriks**: **(20.908, 25.790)**
 
-### Contoh Hasil Rekomendasi User-Based Collaborative Filtering
+#### 2. Menghitung Cosine Similarity Antar User
 
-**Input:**
+Untuk mengetahui tingkat kemiripan antar pengguna:
+
+- **Teknik**: Menggunakan `cosine_similarity` pada User-Item Matrix yang telah diisi missing value-nya (`NaN`) dengan angka 0.
+- **Hasil**: Matriks similarity antar user berukuran **(20.908, 20.908)**.
+
+#### 3. Rekomendasi Berdasarkan User Similarity
+
+**Contoh Input User:**
 > User ID: 8
 
-**Proses:**
-- Sistem mencari Top-5 pengguna lain yang paling mirip berdasarkan cosine similarity.
-- Buku yang dirating tinggi oleh pengguna-pengguna mirip dan belum pernah dibaca oleh user target akan direkomendasikan.
-
-**Hasil Rekomendasi:**
+**Top-3 Rekomendasi Buku:**
 
 | No | ISBN | Book-Title | Book-Author | Average-Rating |
 |:--:|:----:|:----------|:------------|:--------------:|
@@ -496,38 +461,30 @@ Sistem kemudian mencari 5 buku lain yang memiliki tingkat kemiripan tertinggi be
 | 2 | 0684874350 | ANGELA'S ASHES | Frank McCourt | 10.0 |
 | 3 | 0440212561 | Outlander | DIANA GABALDON | 10.0 |
 
-**Catatan:**
-- Hanya 3 buku yang berhasil direkomendasikan karena keterbatasan jumlah ISBN yang cocok dengan data buku (`books_filtered`).
+> Rekomendasi diambil dari buku yang dirating tinggi oleh user lain yang paling mirip, dan belum pernah dibaca oleh user target.
 
 ---
 
-## Collaborative Filtering (Model-Based dengan TensorFlow Keras)
+### Collaborative Filtering (Model-Based - TensorFlow)
 
-### Proses:
-- Encode User-ID dan ISBN ke indeks numerik.
-- Membuat class custom `RecommenderNet` menggunakan Embedding Layer.
-- Membagi data ke dalam training set dan validation set (rasio 80:20).
-- Melatih model menggunakan loss binary crossentropy dan optimizer Adam.
+Pendekatan ini menggunakan model pembelajaran representasi (deep learning) untuk membentuk embedding pengguna dan buku.
 
-### Output:
+#### Proses Model:
+- Encode `user_id` dan `isbn` menjadi integer.
+- Bangun model `RecommenderNet` menggunakan embedding layer untuk user dan book.
+- Data dibagi menjadi 80% train dan 20% validation.
+- Training menggunakan loss `binary_crossentropy` dan optimizer `Adam`.
+
+#### Hasil Output:
 - Jumlah user unik: **20.908**
 - Jumlah buku unik: **25.790**
-- Shape `x_train`: **(163.080, 2)**
-- Shape `y_train`: **(163.080,)**
-- Shape `x_val`: **(40.771, 2)**
-- Shape `y_val`: **(40.771,)**
+- RMSE Training: **~0.1517**
+- RMSE Validation: **~0.1835**
 
-**Hasil Training:**
-- RMSE Training terbaik: sekitar **0.1517**
-- RMSE Validation terbaik: sekitar **0.1835**
+#### Contoh Rekomendasi:
 
-> Model berbasis embedding berhasil dibangun dan dilatih untuk mempelajari representasi laten user dan buku.
-
-### Model-Based Collaborative Filtering (Keras) - Rekomendasi
-
-**User yang dipilih:** User ID: 263663
-
-**Top-5 Buku yang Direkomendasikan:**
+**User:** User ID: 263663  
+**Top-5 Buku:**
 
 | No | Book-Title | Book-Author |
 |:--|:--|:--|
@@ -537,34 +494,32 @@ Sistem kemudian mencari 5 buku lain yang memiliki tingkat kemiripan tertinggi be
 | 4 | Dilbert: A Book of Postcards | Scott Adams |
 | 5 | Harry Potter and the Chamber of Secrets Postcard Book | J.K. Rowling |
 
-**Interpretasi Hasil:**
-- Model berhasil merekomendasikan buku populer dan relevan sesuai preferensi user.
-- Menunjukkan bahwa embedding model dapat menangkap pola dan genre favorit pengguna.
+> Model berbasis embedding menunjukkan kemampuan menangkap pola kompleks dalam preferensi user secara laten.
 
 ---
 
-## Top-N Recommendation Output
+### Top-N Recommendation Output
 
-Pada setiap pendekatan, sistem menghasilkan rekomendasi **Top-N** buku:
-
-- Pada **Content-Based Filtering**, rekomendasi buku-buku yang memiliki kemiripan tinggi berdasarkan judul.
-- Pada **Collaborative Filtering**, rekomendasi buku berdasarkan pola interaksi pengguna.
+- **Content-Based Filtering**: Berdasarkan kemiripan judul buku.
+- **Memory-Based Collaborative Filtering**: Berdasarkan user lain yang mirip.
+- **Model-Based Collaborative Filtering**: Berdasarkan representasi laten dari interaksi user-buku.
 
 ---
 
-## Perbandingan Pendekatan
+### Perbandingan Pendekatan
 
 | Pendekatan | Kelebihan | Kekurangan |
 |:---|:---|:---|
-| **Content-Based Filtering** | - Tidak memerlukan data rating.<br>- Dapat merekomendasikan item baru. | - Hanya merekomendasikan item mirip.<br>- Tidak menangkap pola komunitas. |
-| **Collaborative Filtering (User-Based)** | - Menangkap pola komunitas pengguna.<br>- Rekomendasi bisa lebih beragam. | - Membutuhkan data interaksi user-item.<br>- Rentan cold-start untuk user/buku baru. |
-| **Model-Based CF (Deep Learning)** | - Menangkap kompleksitas preferensi.<br>- Tidak bergantung pada kemiripan eksplisit. | - Butuh waktu training lebih lama.<br>- Rentan overfitting jika data sedikit. |
+| **Content-Based Filtering** | Tidak perlu data rating, cocok untuk cold-start. | Terbatas pada konten mirip. |
+| **User-Based Collaborative Filtering** | Menangkap pola komunitas pengguna. | Sulit untuk user baru, rawan sparsity. |
+| **Model-Based (Deep Learning)** | Menangkap preferensi kompleks. | Butuh training, rentan overfitting jika data sedikit. |
 
-Dengan menggabungkan tiga pendekatan ini, sistem rekomendasi menjadi lebih kuat dan fleksibel dalam memberikan saran buku yang relevan, baik berdasarkan konten maupun perilaku pengguna.
+> Kombinasi ketiga pendekatan ini memberikan sistem rekomendasi yang lebih kuat, fleksibel, dan relevan baik untuk user baru maupun lama.
 
 ---
 
 # Evaluation
+
 Pada bagian ini, kami mengevaluasi kinerja sistem rekomendasi yang telah dibangun menggunakan dua pendekatan: Content-Based Filtering dan Collaborative Filtering (baik Memory-Based maupun Model-Based).
 
 ---
@@ -589,6 +544,19 @@ RMSE banyak digunakan dalam masalah regresi, termasuk prediksi rating, karena me
 **Interpretasi:**
 - RMSE training dan validation relatif kecil, menunjukkan bahwa model mampu melakukan prediksi rating dengan akurasi yang baik.
 - Perbedaan antara RMSE training dan validation juga tidak terlalu besar, sehingga tidak terdapat indikasi overfitting yang parah.
+
+---
+
+## Content-Based Filtering (Precision@5):
+- **Average Precision@5**: **0.0633**
+
+**Interpretasi:**
+- Rata-rata hanya 6.3% dari buku yang direkomendasikan (Top-5) sesuai preferensi user berdasarkan histori rating.
+- Sistem cenderung merekomendasikan buku dengan judul mirip, tetapi belum tentu relevan secara personal.
+
+**Insight Tambahan:**
+- Rendahnya precision disebabkan keterbatasan fitur konten (hanya judul).
+- CBF tetap berguna untuk mengatasi masalah cold-start pada user baru.
 
 ---
 
@@ -653,8 +621,8 @@ Model telah berhasil menjawab seluruh problem statements, memenuhi goals bisnis,
 
 ## Kesimpulan Evaluasi Hasil Rekomendasi
 
-- Content-Based Filtering efektif dalam menemukan buku-buku serupa berdasarkan fitur konten.
-- User-Based Collaborative Filtering efektif menghubungkan user dengan user lain yang memiliki minat serupa.
-- Model-Based Collaborative Filtering berbasis Keras mampu menangkap pola kompleks dalam interaksi user dan buku, dan menghasilkan rekomendasi yang lebih fleksibel dan personal.
+- **Content-Based Filtering** efektif sebagai pendekatan awal, namun performanya terbatas karena hanya mengandalkan judul buku. Evaluasi dengan Precision@5 menghasilkan nilai **0.0633**, menunjukkan adanya ruang perbaikan dari sisi fitur konten.
+- **User-Based Collaborative Filtering** membantu merekomendasikan buku berdasarkan user lain dengan minat serupa, namun terbatas jika user baru atau datanya minim.
+- **Model-Based Collaborative Filtering** memberikan hasil terbaik dalam menangkap pola laten preferensi pengguna, ditunjukkan oleh nilai RMSE rendah dan learning curve yang stabil.
 
-**Semua metrik dan hasil evaluasi konsisten dengan konteks data, problem statement, dan solusi yang ditargetkan.**
+**Semua pendekatan saling melengkapi dan konsisten dengan kebutuhan bisnis yang telah dirumuskan dalam tahap Business Understanding.**
